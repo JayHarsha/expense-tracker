@@ -8,8 +8,10 @@ interface AuthContextValue {
   user: UserSummary | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<OtpIssuedResponse>;
   verifySignup: (email: string, code: string) => Promise<void>;
+  updateUser: (user: UserSummary) => void;
   logout: () => void;
 }
 
@@ -39,6 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
   }, []);
 
+  const loginWithGoogle = useCallback(async (idToken: string) => {
+    const res = await authApi.googleLogin(idToken);
+    tokenStorage.setSession(res.accessToken, res.refreshToken, res.user);
+    setUser(res.user);
+  }, []);
+
   const signup = useCallback(async (name: string, email: string, password: string) => {
     return authApi.signup(name, email, password);
   }, []);
@@ -49,9 +57,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
   }, []);
 
+  const updateUser = useCallback((updated: UserSummary) => {
+    tokenStorage.setUser(updated);
+    setUser(updated);
+  }, []);
+
   const value = useMemo<AuthContextValue>(
-    () => ({ user, isAuthenticated: !!user, login, signup, verifySignup, logout }),
-    [user, login, signup, verifySignup, logout],
+    () => ({ user, isAuthenticated: !!user, login, loginWithGoogle, signup, verifySignup, updateUser, logout }),
+    [user, login, loginWithGoogle, signup, verifySignup, updateUser, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

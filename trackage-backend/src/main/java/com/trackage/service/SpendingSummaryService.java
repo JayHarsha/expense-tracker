@@ -78,7 +78,8 @@ public class SpendingSummaryService {
 
     private LocalDate[] resolveRange(String yearMonth) {
         if (yearMonth == null || !yearMonth.matches("\\d{4}-\\d{2}")) {
-            return new LocalDate[]{null, null};
+            // "All time" - concrete bounds because the repository queries always bind both.
+            return new LocalDate[]{LocalDate.of(1970, 1, 1), LocalDate.of(9999, 12, 31)};
         }
         int y = Integer.parseInt(yearMonth.substring(0, 4));
         int m = Integer.parseInt(yearMonth.substring(5));

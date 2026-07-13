@@ -25,8 +25,8 @@ export function GroupSpendingSummary({ groupId }: { groupId: number }) {
         <div className="space-y-1">
           <div className="grid grid-cols-3 gap-2 px-2 text-xs font-medium text-slate-400">
             <span>Member</span>
-            <span className="text-right">Share (before settling)</span>
-            <span className="text-right">Actually paid (after settling)</span>
+            <span className="text-right">Paid so far</span>
+            <span className="text-right">Spend once settled up</span>
           </div>
           {summary.map((m) => (
             <div
@@ -34,8 +34,8 @@ export function GroupSpendingSummary({ groupId }: { groupId: number }) {
               className="grid grid-cols-3 gap-2 rounded-md bg-slate-50 px-2 py-1.5 text-sm dark:bg-slate-800"
             >
               <span>{m.userName}</span>
-              <span className="text-right">${m.share.toFixed(2)}</span>
               <span className="text-right">${m.actualSpent.toFixed(2)}</span>
+              <span className="text-right">${m.share.toFixed(2)}</span>
             </div>
           ))}
         </div>

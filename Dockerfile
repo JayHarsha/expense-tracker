@@ -7,6 +7,10 @@ WORKDIR /frontend
 COPY trackage-frontend/package.json trackage-frontend/package-lock.json ./
 RUN npm ci
 COPY trackage-frontend/. .
+# Vite bakes env vars into the bundle at build time; the OAuth client ID is
+# public by design, so passing it as a build arg is safe.
+ARG VITE_GOOGLE_CLIENT_ID=
+ENV VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
 RUN npm run build
 
 FROM maven:3.9-eclipse-temurin-21 AS backend-build

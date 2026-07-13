@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { useAuth } from '../context/AuthContext';
 import { extractErrorMessage } from '../lib/apiClient';
 
@@ -78,6 +79,9 @@ export function LoginPage() {
           {loading ? 'Logging in…' : 'Log in'}
         </button>
       </form>
+      <div className="mt-4">
+        <GoogleSignInButton />
+      </div>
       <div className="mt-4 flex justify-between text-sm text-slate-500">
         <Link to="/forgot-password" className="font-medium text-brand-700 dark:text-brand-400">
           Forgot password?

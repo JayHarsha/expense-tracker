@@ -35,6 +35,10 @@ public class User {
     @Builder.Default
     private boolean emailVerified = false;
 
+    /** Optional profile picture as a small data URL (resized client-side before upload). */
+    @Column(columnDefinition = "TEXT")
+    private String avatar;
+
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 

@@ -2,6 +2,7 @@ package com.trackage.controller;
 
 import com.trackage.dto.AuthResponseDTO;
 import com.trackage.dto.ForgotPasswordRequestDTO;
+import com.trackage.dto.GoogleLoginRequestDTO;
 import com.trackage.dto.LoginRequestDTO;
 import com.trackage.dto.OtpIssuedResponseDTO;
 import com.trackage.dto.RefreshRequestDTO;
@@ -40,6 +41,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO req) {
         return ResponseEntity.ok(authService.login(req));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponseDTO> googleLogin(@Valid @RequestBody GoogleLoginRequestDTO req) {
+        return ResponseEntity.ok(authService.googleLogin(req.getIdToken()));
     }
 
     @PostMapping("/forgot-password")

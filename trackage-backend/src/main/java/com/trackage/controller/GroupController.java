@@ -41,6 +41,12 @@ public class GroupController {
         return groupService.getGroupDetail(id, currentUserId);
     }
 
+    @PatchMapping("/{id}")
+    public GroupSummaryDTO rename(@PathVariable Long id, @Valid @RequestBody CreateGroupRequestDTO req,
+                                   @AuthenticationPrincipal Long currentUserId) {
+        return groupService.renameGroup(id, req.getName(), currentUserId);
+    }
+
     @PostMapping("/join")
     public ResponseEntity<GroupSummaryDTO> join(@Valid @RequestBody JoinGroupRequestDTO req,
                                                  @AuthenticationPrincipal Long currentUserId) {

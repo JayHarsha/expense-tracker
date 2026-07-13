@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useBalances, useSettlementSuggestions } from '../api/balances';
 import { useDeleteExpense, useExpenses, useRecordSettlement } from '../api/expenses';
-import { useAddPlaceholderMember, useGroupDetail, useLeaveGroup } from '../api/groups';
+import { useAddPlaceholderMember, useGroupDetail, useLeaveGroup, useRenameGroup } from '../api/groups';
 import { Avatar } from '../components/Avatar';
 import { BalanceBubbles } from '../components/BalanceBubbles';
 import { ExpenseListItem } from '../components/ExpenseListItem';
@@ -21,6 +21,8 @@ export function GroupDetailPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [recordingKey, setRecordingKey] = useState<string | null>(null);
   const [newMemberName, setNewMemberName] = useState('');
+  const [renaming, setRenaming] = useState(false);
+  const [renameValue, setRenameValue] = useState('');
   const [lastSettlement, setLastSettlement] = useState<
     { expenseId: number; fromName: string; toName: string; amount: number } | null
   >(null);
@@ -33,6 +35,7 @@ export function GroupDetailPage() {
   const deleteExpense = useDeleteExpense(groupId);
   const leaveGroup = useLeaveGroup();
   const addPlaceholderMember = useAddPlaceholderMember(groupId);
+  const renameGroup = useRenameGroup(groupId);
 
   if (groupLoading || !group || !user) {
     return <p className="text-sm text-slate-500">Loading…</p>;
@@ -75,6 +78,13 @@ export function GroupDetailPage() {
     setNewMemberName('');
   };
 
+  const onRename = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!renameValue.trim()) return;
+    await renameGroup.mutateAsync(renameValue.trim());
+    setRenaming(false);
+  };
+
   const recentExpenses = expenses?.slice(0, RECENT_COUNT) ?? [];
   const totalCount = expenses?.length ?? 0;
   const totalSpent = expenses?.reduce((sum, e) => sum + e.amount, 0) ?? 0;
@@ -82,7 +92,7 @@ export function GroupDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Avatar id={user.id} name={user.name} size={32} />
+        <Avatar id={user.id} name={user.name} avatar={user.avatar} size={32} />
         <div className="relative">
           <button
             onClick={() => setMenuOpen((v) => !v)}
@@ -97,7 +107,7 @@ export function GroupDetailPage() {
               <div className="mb-3 space-y-2">
                 {group.members.map((m) => (
                   <div key={m.id} className="flex items-center gap-2">
-                    <Avatar id={m.id} name={m.name} size={24} />
+                    <Avatar id={m.id} name={m.name} avatar={m.avatar} size={24} />
                     <span className="text-sm">{m.name}</span>
                     {m.isPlaceholder && (
                       <span className="rounded-full bg-slate-200 px-1.5 py-0.5 text-[10px] text-slate-600 dark:bg-slate-700 dark:text-slate-300">
@@ -141,7 +151,48 @@ export function GroupDetailPage() {
       <GroupSpendingSummary groupId={groupId} />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold">{group.name}</h1>
+        {renaming ? (
+          <form onSubmit={onRename} className="flex flex-1 items-center gap-2 pr-3">
+            <input
+              autoFocus
+              required
+              maxLength={150}
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              className="w-full rounded-md border border-slate-300 px-2 py-1 text-lg font-bold dark:border-slate-700 dark:bg-slate-900"
+            />
+            <button
+              type="submit"
+              disabled={renameGroup.isPending || !renameValue.trim()}
+              className="shrink-0 rounded-md bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setRenaming(false)}
+              className="shrink-0 text-sm text-slate-500 hover:underline"
+            >
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg font-bold">{group.name}</h1>
+            <button
+              type="button"
+              onClick={() => {
+                setRenameValue(group.name);
+                setRenaming(true);
+              }}
+              aria-label="Rename group"
+              title="Rename group"
+              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+            >
+              ✏️
+            </button>
+          </div>
+        )}
         <Link
           to={`/groups/${groupId}/expenses/new`}
           className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-xl text-white hover:bg-brand-700"

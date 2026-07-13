@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { useAuth } from '../context/AuthContext';
 import { extractErrorMessage } from '../lib/apiClient';
 
@@ -70,6 +71,9 @@ export function SignupPage() {
           {loading ? 'Creating account…' : 'Sign up'}
         </button>
       </form>
+      <div className="mt-4">
+        <GoogleSignInButton />
+      </div>
       <p className="mt-4 text-center text-sm text-slate-500">
         Already have an account?{' '}
         <Link to="/login" className="font-medium text-brand-700 dark:text-brand-400">

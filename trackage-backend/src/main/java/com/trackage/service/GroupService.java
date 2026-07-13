@@ -83,6 +83,7 @@ public class GroupService {
                         .id(gm.getUser().getId())
                         .name(gm.getUser().getName())
                         .email(gm.getUser().getEmail())
+                        .avatar(gm.getUser().getAvatar())
                         .isPlaceholder(gm.getUser().isPlaceholder())
                         .build())
                 .toList();
@@ -140,6 +141,15 @@ public class GroupService {
                 .email(placeholder.getEmail())
                 .isPlaceholder(true)
                 .build();
+    }
+
+    @Transactional
+    public GroupSummaryDTO renameGroup(Long groupId, String name, Long requesterId) {
+        assertMember(groupId, requesterId);
+        AppGroup group = appGroupRepository.findById(groupId)
+                .orElseThrow(() -> new ResourceNotFoundException("Group not found"));
+        group.setName(name.trim());
+        return toSummary(group);
     }
 
     @Transactional

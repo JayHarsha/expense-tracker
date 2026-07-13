@@ -23,15 +23,15 @@ export function PersonalSpendingSummary() {
       {data && (
         <div className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="text-xs text-slate-500">Your share</p>
-            <p className="text-lg font-semibold">${data.share.toFixed(2)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-slate-500">Actually paid</p>
+            <p className="text-xs text-slate-500">Paid by you so far</p>
             <p className="text-lg font-semibold">${data.actualSpent.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">{data.netBalance >= 0 ? 'You are owed' : 'You owe'}</p>
+            <p className="text-xs text-slate-500">Your spend once settled up</p>
+            <p className="text-lg font-semibold">${data.share.toFixed(2)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">{data.netBalance >= 0 ? 'You should receive' : 'You should pay'}</p>
             <p className={`text-lg font-semibold ${data.netBalance >= 0 ? 'text-amber-800' : 'text-amber-500'}`}>
               ${Math.abs(data.netBalance).toFixed(2)}
             </p>

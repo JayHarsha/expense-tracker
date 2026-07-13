@@ -9,6 +9,8 @@ const createGroupRequest = (name: string) =>
 const joinGroupRequest = (inviteCode: string) =>
   apiClient.post<GroupSummary>('/groups/join', { inviteCode }).then((r) => r.data);
 const leaveGroupRequest = (id: number) => apiClient.delete(`/groups/${id}/members/me`);
+const renameGroupRequest = ({ groupId, name }: { groupId: number; name: string }) =>
+  apiClient.patch<GroupSummary>(`/groups/${groupId}`, { name }).then((r) => r.data);
 const addPlaceholderMemberRequest = ({ groupId, name }: { groupId: number; name: string }) =>
   apiClient.post<UserSummary>(`/groups/${groupId}/members`, { name }).then((r) => r.data);
 
@@ -48,6 +50,14 @@ export function useLeaveGroup() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: leaveGroupRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['groups'] }),
+  });
+}
+
+export function useRenameGroup(groupId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (name: string) => renameGroupRequest({ groupId, name }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['groups'] }),
   });
 }

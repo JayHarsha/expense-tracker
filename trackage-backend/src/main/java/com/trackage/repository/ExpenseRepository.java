@@ -21,9 +21,10 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
                          @Param("to") LocalDate to,
                          @Param("categoryId") Long categoryId);
 
+    // Callers always pass concrete from/to bounds - see ExpenseSplitRepository note.
     @Query("select coalesce(sum(e.amount), 0) from Expense e"
             + " where e.paidBy.id = :userId and e.group.id in :groupIds"
-            + " and (:from is null or e.date >= :from) and (:to is null or e.date <= :to)")
+            + " and e.date >= :from and e.date <= :to")
     BigDecimal sumPaidByUser(@Param("userId") Long userId, @Param("groupIds") List<Long> groupIds,
                             @Param("from") LocalDate from, @Param("to") LocalDate to);
 }

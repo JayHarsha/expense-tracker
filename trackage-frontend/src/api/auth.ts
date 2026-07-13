@@ -19,6 +19,10 @@ export function login(email: string, password: string) {
   return apiClient.post<AuthResponse>('/auth/login', { email, password }).then((r) => r.data);
 }
 
+export function googleLogin(idToken: string) {
+  return apiClient.post<AuthResponse>('/auth/google', { idToken }).then((r) => r.data);
+}
+
 export function forgotPassword(email: string) {
   return apiClient.post<OtpIssuedResponse>('/auth/forgot-password', { email }).then((r) => r.data);
 }

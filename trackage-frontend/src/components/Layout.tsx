@@ -22,7 +22,9 @@ export function Layout() {
           </div>
           {user && (
             <div className="flex items-center gap-3">
-              <Avatar id={user.id} name={user.name} size={32} />
+              <Link to="/profile" aria-label="Your profile" className="rounded-full transition hover:ring-2 hover:ring-brand-600">
+                <Avatar id={user.id} name={user.name} avatar={user.avatar} size={32} />
+              </Link>
               <button
                 onClick={logout}
                 className="text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"

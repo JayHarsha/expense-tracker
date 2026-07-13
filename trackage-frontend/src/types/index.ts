@@ -2,6 +2,7 @@ export interface UserSummary {
   id: number;
   name: string;
   email: string;
+  avatar: string | null;
   isPlaceholder: boolean;
 }
 

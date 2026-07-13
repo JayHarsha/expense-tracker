@@ -12,9 +12,11 @@ import com.trackage.exception.ForbiddenOperationException;
 import com.trackage.exception.ResourceNotFoundException;
 import com.trackage.repository.RefreshTokenRepository;
 import com.trackage.repository.UserRepository;
+import com.trackage.security.GoogleTokenVerifier;
 import com.trackage.security.HashUtil;
 import com.trackage.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,6 +39,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final OtpService otpService;
+    private final GoogleTokenVerifier googleTokenVerifier;
 
     @Transactional
     public OtpIssuedResponseDTO signup(SignupRequestDTO req) {
@@ -120,6 +123,39 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(newPassword));
     }
 
+    /**
+     * Sign in (or first-time sign up) with a Google ID token. If an account with the
+     * same email already exists - e.g. created earlier via email+password - Google
+     * login links to it rather than creating a duplicate. Google-created accounts get
+     * an unguessable random password; "forgot password" still works to set a real one.
+     */
+    @Transactional
+    public AuthResponseDTO googleLogin(String idToken) {
+        Jwt token = googleTokenVerifier.verify(idToken);
+        String email = token.getClaimAsString("email");
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Google token is missing an email");
+        }
+        if (!Boolean.TRUE.equals(token.getClaimAsBoolean("email_verified"))) {
+            throw new ForbiddenOperationException("Google account email is not verified");
+        }
+        String name = token.getClaimAsString("name");
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            user = userRepository.save(User.builder()
+                    .name(name != null && !name.isBlank() ? name : email)
+                    .email(email)
+                    .passwordHash(passwordEncoder.encode(generateOpaqueToken()))
+                    .emailVerified(true)
+                    .build());
+        } else {
+            // Google already verified this email, so an unverified signup becomes usable.
+            user.setEmailVerified(true);
+        }
+        return issueTokens(user);
+    }
+
     @Transactional
     public AuthResponseDTO refresh(String rawRefreshToken) {
         RefreshToken stored = refreshTokenRepository.findByTokenHash(HashUtil.sha256Hex(rawRefreshToken))
@@ -150,7 +186,12 @@ public class AuthService {
         return AuthResponseDTO.builder()
                 .accessToken(accessToken)
                 .refreshToken(rawRefreshToken)
-                .user(UserSummaryDTO.builder().id(user.getId()).name(user.getName()).email(user.getEmail()).build())
+                .user(UserSummaryDTO.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .avatar(user.getAvatar())
+                        .build())
                 .build();
     }
 

@@ -8,6 +8,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { GroupDetailPage } from './pages/GroupDetailPage';
 import { GroupsDashboardPage } from './pages/GroupsDashboardPage';
 import { LoginPage } from './pages/LoginPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { SignupPage } from './pages/SignupPage';
 import { TransactionsPage } from './pages/TransactionsPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
@@ -34,6 +35,7 @@ export default function App() {
               }
             >
               <Route path="/" element={<GroupsDashboardPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/groups/:id" element={<GroupDetailPage />} />
               <Route path="/groups/:id/transactions" element={<TransactionsPage />} />
               <Route path="/groups/:id/expenses/new" element={<ExpenseFormPage />} />
