@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface BalanceRepository extends JpaRepository<Balance, Long> {
     List<Balance> findByGroup_Id(Long groupId);
+    List<Balance> findByUser_Id(Long userId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Balance> findByGroup_IdAndUser_Id(Long groupId, Long userId);

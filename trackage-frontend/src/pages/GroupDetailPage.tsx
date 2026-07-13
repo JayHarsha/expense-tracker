@@ -6,6 +6,7 @@ import { useAddPlaceholderMember, useGroupDetail, useLeaveGroup } from '../api/g
 import { Avatar } from '../components/Avatar';
 import { BalanceBubbles } from '../components/BalanceBubbles';
 import { ExpenseListItem } from '../components/ExpenseListItem';
+import { GroupSpendingSummary } from '../components/GroupSpendingSummary';
 import { InviteShareBox } from '../components/InviteShareBox';
 import { SettlementSuggestionCard } from '../components/SettlementSuggestionCard';
 import { useAuth } from '../context/AuthContext';
@@ -136,6 +137,8 @@ export function GroupDetailPage() {
       </div>
 
       <BalanceBubbles balances={balances ?? []} />
+
+      <GroupSpendingSummary groupId={groupId} />
 
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold">{group.name}</h1>

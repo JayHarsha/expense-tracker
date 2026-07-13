@@ -4,7 +4,20 @@ export function InviteShareBox({ inviteCode }: { inviteCode: string }) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
-    await navigator.clipboard.writeText(inviteCode);
+    // navigator.clipboard only exists in secure contexts (HTTPS/localhost);
+    // fall back to a hidden textarea + execCommand when served over plain HTTP.
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(inviteCode);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = inviteCode;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };

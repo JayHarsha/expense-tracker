@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateGroup, useGroups, useJoinGroup } from '../api/groups';
 import { GroupCard } from '../components/GroupCard';
+import { PersonalSpendingSummary } from '../components/PersonalSpendingSummary';
 import { extractErrorMessage } from '../lib/apiClient';
 
 export function GroupsDashboardPage() {
@@ -40,6 +41,8 @@ export function GroupsDashboardPage() {
 
   return (
     <div className="space-y-8">
+      <PersonalSpendingSummary />
+
       <section>
         <h1 className="mb-4 text-xl font-bold">Your groups</h1>
         {isLoading && <p className="text-sm text-slate-500">Loading…</p>}

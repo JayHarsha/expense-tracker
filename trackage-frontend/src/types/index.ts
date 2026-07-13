@@ -90,6 +90,19 @@ export interface SettlementSuggestion {
   amount: number;
 }
 
+export interface MemberSpendingSummary {
+  userId: number;
+  userName: string;
+  share: number;
+  actualSpent: number;
+}
+
+export interface PersonalSpendingSummary {
+  share: number;
+  actualSpent: number;
+  netBalance: number;
+}
+
 export interface ApiErrorBody {
   error: string;
   details?: string;
