@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { distributeByWeights } from '../lib/splitMath';
 import type { ExpenseSplitInput, UserSummary } from '../types';
 import { Avatar } from './Avatar';
@@ -32,8 +32,17 @@ export function SplitEditor({
     initialSplits ? Object.fromEntries(initialSplits.map((s) => [s.userId, String(s.amount)])) : {},
   );
 
+  // `initialSplits` (edit flow) is populated by the parent one render *after* mount,
+  // so the useState initializers above run before it exists. Apply it once it arrives
+  // so only the members the expense was actually split with stay checked.
+  const appliedInitial = useRef(false);
   useEffect(() => {
-    if (!initialSplits) {
+    if (initialSplits && !appliedInitial.current) {
+      appliedInitial.current = true;
+      setMode('unequal');
+      setParticipantIds(new Set(initialSplits.map((s) => s.userId)));
+      setRawValues(Object.fromEntries(initialSplits.map((s) => [s.userId, String(s.amount)])));
+    } else if (!initialSplits) {
       setParticipantIds(new Set(members.map((m) => m.id)));
     }
   }, [members, initialSplits]);

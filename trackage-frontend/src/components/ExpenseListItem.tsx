@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { formatRelativeTime } from '../lib/formatRelativeTime';
+import { formatExpenseDate } from '../lib/formatExpenseDate';
 import type { Expense } from '../types';
 import { Avatar } from './Avatar';
 
@@ -24,7 +24,7 @@ export function ExpenseListItem({ expense, currentUserId }: { expense: Expense; 
         <div className="min-w-0">
           <p className="truncate font-medium">{expense.description || expense.categoryName || 'Expense'}</p>
           <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-            {formatRelativeTime(expense.createdAt)}
+            {formatExpenseDate(expense.date, expense.createdAt)}
           </p>
           <p className="truncate text-xs text-slate-500 dark:text-slate-400">
             <span className="font-medium text-slate-700 dark:text-slate-300">{expense.paidByName}</span> paid for{' '}

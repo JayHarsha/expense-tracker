@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useCategories } from '../api/categories';
 import { useCreateExpense, useDeleteExpense, useExpense, useUpdateExpense } from '../api/expenses';
 import { useGroupDetail } from '../api/groups';
+import { AmountCalculator } from '../components/AmountCalculator';
 import { CategoryPicker } from '../components/CategoryPicker';
 import { SplitEditor } from '../components/SplitEditor';
 import { useAuth } from '../context/AuthContext';
@@ -32,6 +33,24 @@ export function ExpenseFormPage() {
   const [splitsValid, setSplitsValid] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initialSplits, setInitialSplits] = useState<ExpenseSplitInput[] | undefined>(undefined);
+  const [showCalc, setShowCalc] = useState(false);
+  const calcWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showCalc) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (calcWrapRef.current && !calcWrapRef.current.contains(e.target as Node)) setShowCalc(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowCalc(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [showCalc]);
 
   const prefilled = useRef(false);
   useEffect(() => {
@@ -94,29 +113,34 @@ export function ExpenseFormPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium">Amount</label>
-            <input
-              type="number"
-              step="0.01"
-              min="0.01"
-              required
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
-            />
+        <div ref={calcWrapRef} className="relative">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium">Amount</label>
+              <button
+                type="button"
+                onClick={() => setShowCalc(true)}
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-left dark:border-slate-700 dark:bg-slate-900"
+              >
+                {amount ? Number(amount).toFixed(2) : <span className="text-slate-400">0.00</span>}
+              </button>
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Date</label>
+              <input
+                type="date"
+                required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full rounded-md border border-slate-300 px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
+              />
+            </div>
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Date</label>
-            <input
-              type="date"
-              required
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 dark:border-slate-700 dark:bg-slate-900"
-            />
-          </div>
+          {showCalc && (
+            <div className="absolute left-0 right-0 z-20 mt-2">
+              <AmountCalculator initial={amount} onChange={setAmount} onClose={() => setShowCalc(false)} />
+            </div>
+          )}
         </div>
 
         <div>
